@@ -9,7 +9,7 @@ First, being a transformer-based model, it is possible to use the HuggingFace-co
 1. Create a HuggingFace serving deployment operation.
 
 ```python
-func = proj.new_function(
+func = project.new_function(
     name="serve", 
     kind="python", 
     python_version="PYTHON3_10", 
