@@ -361,7 +361,7 @@ class TrainerHandler:
         print("Done.")
 
 
-file_basepath = "faudi_data"
+file_basepath = "local_data"
 
 def train(project, train_data, data_path = "data/", model_save_path = "models/", target_model_name = ""):
 
