@@ -14,7 +14,6 @@ for further fine-tuning on new data. The product contains operations for
 
 - Log the data in order to prepare it for training
 - perform model training and registering the model
-- serving the model as an optimized vLLM-based sequence classification API (Open Inference Protocol)
 - serving the model using a custom API.
 
 ## Usage
