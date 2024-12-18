@@ -41,7 +41,7 @@ Once the deployment is activated, the V2 Open Inference Protocol is exposed and 
 3. Test the operation.
 
 To test the functionality of the API, it is possible to use the V2 API calls. The "text" file contain the input text to be classified. The 'k' parameter specify the number of
-classification required. For e.g. the request below asks for single classification label for input text.
+classification labels required. For e.g. the request below asks for single classification label for input text.
 
 ```python
 inputs = {"text": 'famiglia wifi ', "k": 1}
