@@ -1,0 +1,48 @@
+ai: NLP
+domain: PA
+usages: ./docs/usage.md
+howto:
+  - title: Preprocess data for training
+    ref: ./docs/howto/process.md
+  - title: Train the classifier model
+    ref: ./docs/howto/train.md
+  - title: Expose the classifed model as a service
+    ref: ./docs/howto/expose.md
+datasets:
+  - id: train-data-it
+    name: Training data
+    kind: artifact
+models:
+  - id: document-classifier
+    kind: huggingface
+    name: document classifier
+operations:
+  - id: train
+    name: Train the classifier model
+    kind: job
+    task: training
+    implementation:
+      framework: aixpa
+      spec:
+        kind: python 
+        code_src: "git+https://github.com/tn-aixpa/document-classifier" 
+        handler: "src.train:train"
+        python_version: PYTHON3_10
+        requirements: "accelerate==1.1.1", "datasets==3.1.0", "torch==2.5.1", "torch_tensorrt==2.5.0", "torchmetrics==1.6.0", "torchtext==0.18.0", "transformer_engine==1.12.0", "transformer_engine_cu12==1.12.0", "transformers==4.46.3", "pandas==2.2.3", "numpy==2.1.3", "numpyencoder==0.3.0", "scikit-learn==1.5.2", "scipy==1.14.1", "GitPython==3.1.43", "attrs==24.2.0", "async-timeout==5.0.1", "aiosignal==1.3.1", "aiohappyeyeballs==2.4.4", "aiohttp==3.11.9", "Unidecode==1.3.8"
+    inputs:
+      - train-data
+    outputs:
+      - eurovoc-classifier
+deployments:
+  - id: serve
+    name: Expose the classifed model as a custom API
+    kind: service
+    implementation:
+      framework: aixpa
+      spec:
+        kind: python 
+        code_src: "git+https://github.com/tn-aixpa/document-classifier" 
+        handler: "src.serve:serve"
+        init_function: init
+        python_version: PYTHON3_10
+        requirements: "numpy<2", "pandas==2.1.4","transformer_engine==1.12.0", "transformer_engine_cu12==1.12.0", "transformers==4.46.3", "torch==2.5.1", "torchmetrics==1.6.0"
