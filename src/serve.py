@@ -47,7 +47,7 @@ class BertForSentenceClassification(PreTrainedModel):
         return SequenceClassifierOutput(loss=loss, logits=logits)
 
 def init(context):
-    model_name = "family_audit_model"
+    model_name = "document-classifier"
    
     model = context.project.get_model(model_name)
     local_path_model = model.download(overwrite=True)
