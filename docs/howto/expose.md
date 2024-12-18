@@ -40,9 +40,20 @@ Once the deployment is activated, the V2 Open Inference Protocol is exposed and 
 
 3. Test the operation.
 
-To test the functionality of the API, it is possible to use the V2 API calls. 
+To test the functionality of the API, it is possible to use the V2 API calls. The "text" file contain the input text to be classified. The 'k' parameter specify the number of
+classification required. For e.g. the request below asks for single classification label for input text.
 
 ```python
 inputs = {"text": 'famiglia wifi ', "k": 1}
 serve_run.invoke(json={"inference_input": inputs}).text
+```
+
+The api response will return the ids of most probable taxonomy. For futher details, look in to the correspondence.csv file present inside src folder which provide mapping between the ids and related taxonomy.
+
+```
+{
+    "results": [
+        46
+    ]
+}
 ```

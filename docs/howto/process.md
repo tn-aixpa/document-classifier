@@ -16,12 +16,12 @@ project = dh.get_or_create_project(PROJECT_NAME)
 artifact = project.log_artifact(name="train_data_it",
                     kind="artifact",
                     source="./addestramento.gzip")
-)
 ```
 Note that to invoke the operation on the platform, the data should be avaialble as an artifact on the platform datalake.
 
 ```python
 artifact = project.get_artifact("train_data_it")
+artifact.key
 ```
 
 The resulting dataset will be registered as the project artifact in the datalake under the name ``train_data_it``.
