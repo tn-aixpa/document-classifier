@@ -2,7 +2,7 @@ ai: NLP
 domain: PA
 usages: ./docs/usage.md
 howto:
-  - title: Preprocess data for training
+  - title: Log data for training
     ref: ./docs/howto/process.md
   - title: Train the classifier model
     ref: ./docs/howto/train.md
@@ -32,7 +32,7 @@ operations:
     inputs:
       - train-data
     outputs:
-      - eurovoc-classifier
+      - document-classifier
 deployments:
   - id: serve
     name: Expose the classifed model as a custom API
