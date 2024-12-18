@@ -9,23 +9,14 @@ The resulting model may be deployed as a service or used for batch processing. I
 
 In order to reconstruct the classifier model, the presented project provides the necessary routines for acquiring and processing the data, as well as for the model training.
 
-### Data preparation 
+### Data logging 
 
-Once the data is downloaded, it should be prepared for training using the ``preprocessing`` operation (see [how to reprocess data for training](./howto/process.md)). The preprocessing performs the text embedding and splits the data into train and test sets. The operation is configured with the following parameters:
-
-- ``langs`` (``it``): languages of the documents
-- ``years`` (``all``): years (or "all" if the whole dataset should be considered)
-- ``add_title`` (false) whether to include the document title or ``title_only`` (false) only consider document titles
-- ``add_mt_do`` (false) whether to consider all the label types or only TC
-- ``seeds`` (110): seeds for training
-- ``max_length`` (512): max token lenght 
+The data used for training can be found inside 'src' directory 'addestramento.gzip'. The data should be logged in the context of project for training  (see [how to log data for training](./howto/process.md)).
 
 ### Model training
 
 The training data is ready for use by the ``train`` operation (see [how to train the classifier model](./docs/howto/train.md) for details). The operation relies on a series of hyper parameters typical for this kind of models:
 
-- ``langs`` (``it``): language
-- ``seeds`` (110): seeds
 - ``device`` (cpu) device (e.g., CPU or GPU-based - ``cuda:0``)
 - ``epochs`` (100): number of training epochs
 - ``batch_size`` (8): batch size of the dataset
@@ -41,6 +32,5 @@ The training data is ready for use by the ``train`` operation (see [how to train
 For the realistic datasets the GPU is required for training of the model. 
 
 ### Model serving
-Once model is ready, it is possible to expose a service (API) on top of the model. The model may be exposed in a standard manner, using KServe vLLM-based serving environment. In this case the model is exposed using the V2 Open Inference Protocol. Alternatively the ``serve`` operation provides an implementation of python-based Serverless function for exposing a custom API. The two implementation provides different ways to manage the results. In particular, the custom one allows for specifying the max number of labels to return and provides and confidence score regarding each label. 
+Once model is ready, it is possible to expose a service (API) on top of the model. The model here is exposed using ``serve`` operation that provides an implementation of python-based Serverless function for exposing a custom API. The API allows for specifying the max number of labels to return. 
 
-Also in case of model training GPU is required for the inference.
