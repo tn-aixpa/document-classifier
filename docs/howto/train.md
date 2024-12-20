@@ -13,14 +13,14 @@ project = dh.get_or_create_project(PROJECT_NAME)
 
 2. Define the function
 
-Register the ``train`` function in the project
+Register the ``train`` function in the project. It is required to update the 'code_src' url with github username and personal access token in the code cell below
 
 ```python
 func = project.new_function(
     name="train", 
     kind="python", 
     python_version="PYTHON3_10", 
-    code_src="git+https://github.com/tn-aixpa/document-classifier", 
+    code_src="git+https://<username>:<personal_access_token>@github.com/tn-aixpa/document-classifier", 
     handler="src.train:train",
     requirements=["accelerate==1.1.1", "datasets==3.1.0", "torch==2.5.1", "torch_tensorrt==2.5.0", "torchmetrics==1.6.0", "torchtext==0.18.0", "transformer_engine==1.12.0", "transformer_engine_cu12==1.12.0", "transformers==4.46.3", "pandas==2.2.3", "numpy==2.1.3", "numpyencoder==0.3.0", "scikit-learn==1.5.2", "scipy==1.14.1", "GitPython==3.1.43", "attrs==24.2.0", "async-timeout==5.0.1", "aiosignal==1.3.1", "aiohappyeyeballs==2.4.4", "aiohttp==3.11.9", "Unidecode==1.3.8"]
 )
