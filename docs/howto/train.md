@@ -36,7 +36,7 @@ artifact = project.get_artifact("train_data_it")
 ```
 
 Furthermore, the amount of data may be significant so the default container space may be not enough. The operation expects a volume
-attached to the container under ``/files`` path. Create a Persistent Volume Clain first and attach it to the run as shown below.
+attached to the container under ``/files`` path. Create a persistent volume claim first using the kubernetes resource manager component(KRM) (See [instructions](https://scc-digitalhub.github.io/docs/tasks/resources/#managing-persistent-volume-claims)) . Once created, attach it to the run as shown below.
 
 
 ```python
