@@ -43,9 +43,8 @@ nl = st.number_input("Numero di labels", min_value=1)
 if st.button("Annota"):
     pred = annotate(ta, nl)
     #st.text(pred['results'])
-    dID, c, cd, m, md = answer(el)
     result = ''
-    for el in pred:
+    for el in pred['results']:
         dID, c, cd, m, md = answer(el)
         result = result + f'ID tassonomia di azione: {dID}' + '\n'
     st.text(result)
