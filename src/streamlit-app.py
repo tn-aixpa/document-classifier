@@ -32,22 +32,20 @@ def annotate(text, nl):
 
 
 st.title('Document classifier')
-
-service_url = os.environ.get("SERVICE_URL", "dclassifier.services.tenant2.digitalhub-dev.smartcommunitylab.it")
+service_url = os.environ.get("SERVICE_URL", "")
 
 if service_url == None or service_url == "":
     service_url = st.text_input("Service Endpoint", value="", placeholder="host:port")
-
 
 ta = st.text_area("Testo", value="", placeholder="Fornisci il testo da classificare", height=340)
 nl = st.number_input("Numero di labels", min_value=1)
 
 if st.button("Annota"):
     pred = annotate(ta, nl)
-    st.text(pred['results'])
-    # dID, c, cd, m, md = answer(el)
-    # result = ''
-    # for el in pred:
-    #     dID, c, cd, m, md = answer(el)
-    #     result = result + f'ID tassonomia di azione: {dID}' + '\n'
-    # st.text(result)
+    #st.text(pred['results'])
+    dID, c, cd, m, md = answer(el)
+    result = ''
+    for el in pred:
+        dID, c, cd, m, md = answer(el)
+        result = result + f'ID tassonomia di azione: {dID}' + '\n'
+    st.text(result)
