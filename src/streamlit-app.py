@@ -31,8 +31,6 @@ def annotate(text):
     return preds
 
 
-load_mappings()
-
 st.title('Document classifier')
 
 service_url = os.environ.get("SERVICE_URL", "s-pythonserve-26f3d00d17414223a96f6bfcf491541f.digitalhub-tenant2:8080")
