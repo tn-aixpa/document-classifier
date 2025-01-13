@@ -8,7 +8,7 @@ import digitalhub as dh
 import os
 import streamlit
 
-correspondence
+global correspondence
 
 @st.cache_data
 def load_correspondence():
