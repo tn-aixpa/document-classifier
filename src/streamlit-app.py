@@ -33,7 +33,7 @@ def annotate(text):
 
 st.title('Document classifier')
 
-service_url = os.environ.get("SERVICE_URL", "s-pythonserve-26f3d00d17414223a96f6bfcf491541f.digitalhub-tenant2:8080")
+service_url = os.environ.get("SERVICE_URL", "dclassifier.services.tenant2.digitalhub-dev.smartcommunitylab.it")
 
 if service_url == None or service_url == "":
     service_url = st.text_input("Service Endpoint", value="", placeholder="host:port")
