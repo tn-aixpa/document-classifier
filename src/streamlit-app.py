@@ -26,7 +26,7 @@ def answer(ID_tassonomia):
     return dID, c, cd, m, md
     
 def annotate(text):
-    body = {"inference_input": text, "k": 1}}
+    body = {"inference_input": text, "k": 1}
     preds = requests.post(f"http://{service_url}/", json=body).json()
     return preds
 
