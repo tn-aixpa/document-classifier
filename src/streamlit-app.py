@@ -30,6 +30,6 @@ if st.button("Annota"):
     result = ''
     for el in pred['results']:
         dID, c, cd, m, md = correspondence.loc[
-        correspondence.ID_tassonomia == ID_tassonomia, ['azione', 'campi', 'descrizione_codice_campo', 'macroambiti', descrizione_codice_macro']].values[0]
+        correspondence.ID_tassonomia == ID_tassonomia, ['azione', 'campi', 'descrizione_codice_campo', 'macroambiti', 'descrizione_codice_macro']].values[0]
         result = result + f'ID tassonomia di azione: {dID}' + '\n'
     st.text(result)
