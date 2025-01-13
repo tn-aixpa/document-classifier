@@ -25,8 +25,8 @@ def answer(ID_tassonomia):
                                                         'descrizione_codice_macro']].values[0]
     return dID, c, cd, m, md
     
-def annotate(text):
-    body = {"inference_input": text, "k": 1}
+def annotate(text, nl):
+    body = {"inference_input": text, "k": nl}
     preds = requests.post(f"http://{service_url}/", json=body).json()
     return preds
 
@@ -40,9 +40,10 @@ if service_url == None or service_url == "":
 
 
 ta = st.text_area("Testo", value="", placeholder="Fornisci il testo da classificare", height=340)
+nl = st.number_input("Numero di labels", min_value=1)
 
 if st.button("Annota"):
-    pred = annotate(ta)
+    pred = annotate(ta, nl)
     st.text(pred['results'])
     # dID, c, cd, m, md = answer(el)
     # result = ''
