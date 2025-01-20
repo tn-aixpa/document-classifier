@@ -207,8 +207,7 @@ from transformers.modeling_outputs import SequenceClassifierOutput
 from transformers import AutoConfig, TrainingArguments, EarlyStoppingCallback, Trainer
 
 from datetime import date, datetime
-
-# import pandas as pd
+import os
 
 import json
 # import wandb
@@ -228,7 +227,7 @@ class BertForSentenceClassification(PreTrainedModel):
         self.classifier = nn.Linear(self.bert.config.hidden_size, num_labels)
         self.class_weights = class_weights
         self.accuracy = Accuracy(num_classes=num_labels, task='multiclass')
-        self.f1 = MulticlassF1Score(num_classes=num_labels, average='micro') # changed weight
+        self.f1 = MulticlassF1Score(num_classes=num_labels, average='macro') # changed weight,micro None, ‘binary’ (default), ‘micro’, ‘macro’, ‘samples’, ‘weighted’]
 
     def forward(self, input_ids, attention_mask=None, labels=None):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
@@ -296,11 +295,20 @@ class TrainerHandler:
             f1_score: by default, it's the micro F1 weighted on class frequency.
         """
         now = datetime.today()
-        pd.DataFrame({
+        
+        csvFile = self.model_save_path + '/' +  f'{self.model_name}.csv';
+
+        df = pd.DataFrame({
             'F1': [f1_score.item()],
             'modello': [self.model_name],
             'T': [now],
-        }).to_csv(f'{self.model_name}.csv')
+        })
+        
+        if not os.path.isfile(csvFile):
+            df.to_csv(csvFile, header='column_names', index=False)
+        else:  # else it exists so append without writing the header
+            df.to_csv(csvFile, mode='a', header=False, index=False)        
+        
         print(f"F1 score saved to {self.model_name}.csv")
 
     def save_predictions(self, logits, labels):
@@ -328,7 +336,7 @@ class TrainerHandler:
         results.true_label, results.predicted_label = results.true_label + 1, results.predicted_label + 1
 
         file_name = f'{self.model_name}_{now.month}_{now.day}-{now.hour}_{now.minute}.csv'
-        results.to_csv(file_name, index=False)
+        results.to_csv(self.model_save_path + '/' + file_name, index=False)
         print(f"Predictions saved to {file_name}")
 
     def save_model_and_tokenizer(self):
@@ -361,8 +369,45 @@ class TrainerHandler:
         print("Done.")
 
 
-file_basepath = "local_data"
+    
+file_basepath = "document-classifier"
 
+import evaluate
+def compute_metrics(eval_pred):
+    metrics = ["f1","accuracy", "recall", "precision"] #List of metrics to return ,
+    metric={}
+    for met in metrics:
+        metric[met] = evaluate.load(met)#load_metric(met)
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1)
+    metric_res={}
+    for met in metrics:
+        if (met != 'accuracy'):
+            metric_res[met]=metric[met].compute(predictions=predictions, references=labels, average='macro')[met]
+        else:
+            metric_res[met]=metric[met].compute(predictions=predictions, references=labels)[met]
+    
+    dir = f"{file_basepath}/models/"
+    DATA_FILENAME = dir +  f'metrics.json';
+
+    # Create the directory for the data
+    if not path.exists(dir):
+        makedirs(dir)
+    
+    file_data = []
+    if (path.exists(DATA_FILENAME)):
+        with open(DATA_FILENAME , "r") as json_file:
+            file_data = json.loads(json_file.read())
+
+    # change it
+    file_data.append(metric_res)     
+
+    # write it all back 
+    with open(DATA_FILENAME , "w") as json_file:
+        json_file.write(json.dumps(file_data))
+    
+    return metric_res
+    
 def train(project, train_data, data_path = "data/", model_save_path = "models/", target_model_name = ""):
 
     model_dir = f"{file_basepath}/{model_save_path}"
@@ -409,14 +454,13 @@ def train(project, train_data, data_path = "data/", model_save_path = "models/",
          .from_pretrained(pretrained_model_name_or_path=model_name,
                           model_name=model_name,
                           config=config,
-                          num_labels=num_labels,
-                          )) #class_weights=class_weights
+                          num_labels=num_labels)) #class_weights=class_weights
     training_args = TrainingArguments(
         output_dir='tuned_model',
         eval_strategy='epoch',
         save_strategy='epoch',
-        save_total_limit=5,
-        num_train_epochs=1,
+        save_total_limit=2,
+        num_train_epochs=3,
         per_device_train_batch_size=16,
         per_device_eval_batch_size=16,
         gradient_accumulation_steps=2,
@@ -424,13 +468,17 @@ def train(project, train_data, data_path = "data/", model_save_path = "models/",
         learning_rate=1e-5,
         lr_scheduler_type='linear',
         load_best_model_at_end=True,
+        evaluation_strategy = "epoch", #To calculate metrics per epoch
+        logging_strategy="epoch"
+        
     )
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_datasets['train'],
         eval_dataset=tokenized_datasets['validation'],
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=1)]
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=1)],
+        compute_metrics=compute_metrics
     )
     trainer.tokenizer = tokenize_function.get_tokenizer()
     
@@ -443,11 +491,26 @@ def train(project, train_data, data_path = "data/", model_save_path = "models/",
         model_save_path=model_dir
     )
     handler.run()
+
+    # metrics={}
+    # df = pd.read_csv(model_dir + '/' +  f'{target_model_name}.csv')
+    # last_row = df.tail(1)
+    # metrics['F1'] = last_row['F1'].values[0]
+    # for key, value in df.iterrows():
+    #     metrics[f'F1_epoch{key+1}'] = value['F1']
+    
+    df = pd.read_json(model_dir + '/metrics.json')
+    last_row = df.tail(1)
+    model_metrics = ["f1","accuracy", "recall", "precision"]
+    metrics = {}
+    for met in model_metrics:    
+        metrics[met] = last_row[met].values[0]
+    
     project.log_model(
         name=target_model_name,
         kind="huggingface",
         base_model="dbmdz/bert-base-italian-xxl-cased",
-        # metrics=metrics,
+        metrics=metrics,
         source=model_dir,
     )             
 
