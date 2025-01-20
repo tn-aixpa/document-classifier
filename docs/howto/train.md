@@ -41,7 +41,7 @@ attached to the container under ``/files`` path. Create a persistent volume clai
 
 ```python
 train_run = func.run(action="job", inputs={"train_data": artifact.key},
-					parameters={"data_path": "/data", "model_save_path": "/model", "target_model_name": "document-classifier"},
+					parameters={"data_path": "/data", "model_save_path": "/models", "target_model_name": "document-classifier"},
 					volumes=[{ 
 					"volume_type": "persistent_volume_claim", 
 					"name": "volume-document-classifier", 
