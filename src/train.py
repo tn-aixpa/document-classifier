@@ -210,7 +210,7 @@ from datetime import date, datetime
 import os
 
 import json
-# import wandb
+import evaluate
 
 class BertForSentenceClassification(PreTrainedModel):
 
@@ -241,15 +241,7 @@ class BertForSentenceClassification(PreTrainedModel):
 
             f1_score = self.f1(logits.argmax(dim=1), labels)
             accuracy_score = self.accuracy(logits.argmax(dim=1), labels)
-            # wandb.log({
-            #     "f1_score": f1_score,
-            #     "accuracy": accuracy_score,
-            #     'CrossEntropyLoss': loss.item() if loss is not None else None
-            # })
-            # print("F1 score", f1_score)
-            # print("accuracy", accuracy_score)
-            # print("CrossEntropyLoss", loss.item())
-
+        
         return SequenceClassifierOutput(loss=loss, logits=logits)
 
 class TrainerHandler:
@@ -368,11 +360,6 @@ class TrainerHandler:
         self.save_model_and_tokenizer()
         print("Done.")
 
-
-    
-file_basepath = "document-classifier"
-
-import evaluate
 def compute_metrics(eval_pred):
     metrics = ["f1","accuracy", "recall", "precision"] #List of metrics to return ,
     metric={}
@@ -387,8 +374,10 @@ def compute_metrics(eval_pred):
         else:
             metric_res[met]=metric[met].compute(predictions=predictions, references=labels)[met]
     
-    dir = f"{file_basepath}/models/"
-    DATA_FILENAME = dir +  f'metrics.json';
+    dir = f"{model_dir}"
+    DATA_FILENAME = dir +  '/metrics.json';
+
+    print("GOING TO SAVE METRICS INSIDE ->", DATA_FILENAME)
 
     # Create the directory for the data
     if not path.exists(dir):
@@ -408,8 +397,11 @@ def compute_metrics(eval_pred):
     
     return metric_res
     
-def train(project, train_data, data_path = "data/", model_save_path = "models/", target_model_name = ""):
+file_basepath = "document_classifier"
 
+def train(project, train_data, data_path = "data", model_save_path = "model", target_model_name = ""):
+
+    global model_dir
     model_dir = f"{file_basepath}/{model_save_path}"
     data_dir = f"{file_basepath}/{data_path}"
     
