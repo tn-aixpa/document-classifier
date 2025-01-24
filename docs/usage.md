@@ -17,17 +17,12 @@ The data used for training can be found inside 'src' directory 'addestramento.gz
 
 The training data is ready for use by the ``train`` operation (see [how to train the classifier model](./docs/howto/train.md) for details). The operation relies on a series of hyper parameters typical for this kind of models:
 
-- ``device`` (cpu) device (e.g., CPU or GPU-based - ``cuda:0``)
 - ``epochs`` (100): number of training epochs
 - ``batch_size`` (8): batch size of the dataset
 - ``learning_rate`` (3e-5): learning rate
 - ``max_grad_norm`` (5): Gradient clipping norm
-- ``threshold`` (0.5): Threshold for the prediction confidence
-- Whether to enable the custom loss (``custom_loss``, false) and to enable the weighted bcewithlogits loss (``weighted_loss``, false)
-- ``fp16`` (false): Enable fp16 mixed precision training.
-- ``eval_metric`` (``f1_micro``) Evaluation metric
-- ``full_metrics`` (false): Whether to extract full metric set for model metadata
-- Whether to save training reports (``save_class_report``, false) and how frequently (``class_report_step``, 1).
+- ``weight_decay`` (0.005): Decoupled weight decay to apply.
+- ``lr_scheduler_type`` ('linear'): By default, it uses “linear”. Internally, this retrieves get_linear_schedule_with_warmup scheduler from Trainer. Scheduler types (linear,cosine,cosine_with_restarts,polynomial,constant). For more info see [HuggingFace transformer library](https://huggingface.co/docs/transformers/en/index)
 
 For the realistic datasets the GPU is required for training of the model. 
 
