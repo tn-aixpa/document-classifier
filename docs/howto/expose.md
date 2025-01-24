@@ -1,25 +1,25 @@
 # How to expose classifier model
 
-The classifer model may be exposed as an API for classification in different modes. 
+The classifer model may be exposed as an API for classification in different modes. In this template project, we have used the Custom API approach to serve the generated model.
 
-## Exposing model with Open Inference Protocol API
+## Exposing model with Custom API
 
-First, being a transformer-based model, it is possible to use the HuggingFace-compatible KServe deployment. Specifically, within the platform this may be achieved as follows.
+To deploy more specific API that takes into account the types of labels, it is possible to use the ``serve`` operation defined in the project. Specifically, the following steps should be performed.
 
-1. Create a HuggingFace serving deployment operation. It is required to update the 'code_src' url with github username and personal access token in the code cell below
-
+1. Register the ``serve`` deployment operation in the project
 
 ```python
 func = project.new_function(
     name="serve", 
     kind="python", 
     python_version="PYTHON3_10", 
-    code_src="git+https://github.com/tn-aixpa/document-classifier",     
+    code_src="git+https://<username>:<personal_access_token>@github.com/tn-aixpa/faudit-classifier",     
     handler="src.serve:serve",
     init_function="init",
     requirements=["numpy<2", "pandas==2.1.4","transformer_engine==1.12.0", "transformer_engine_cu12==1.12.0", "transformers==4.46.3", "torch==2.5.1", "torchmetrics==1.6.0"]
 )
 ```
+The function represent a Python Serverless function that should be deployed on cluster.
 
 2. Activate the deployment.
 
