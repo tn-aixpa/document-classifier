@@ -8,7 +8,10 @@ input data. The training data looks like following table
 |0|text1....| 11
 |1|text2....| 12
 
-Prepare a balanced dataset of your choice. For an example, see  [sample train dataset](/src/train_data.csv). For the sake of tutorial it is demonstrated below, how one can register the dataset inside to the digitalhub platform.
+Prepare a balanced dataset of your choice. The template project works fine if you use your own balanced dataset which contain labels and text. For an example, see  [sample train dataset](/src/train_data.csv). 
+The project performs all the necessary steps including label encoding, preparation of test, validate, and training dataset from the input dataset making it ready for model training.
+
+For the sake of tutorial it is demonstrated below, how one can register the dataset inside to the digitalhub platform.
 
 1. Initialize the project
 
