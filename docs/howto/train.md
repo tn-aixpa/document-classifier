@@ -32,7 +32,8 @@ The function represent a Python operation and may be invoked directly locally or
 Note that to invoke the operation on the platform, the data should be avaialble as an artifact on the platform datalake.
 
 ```python
-artifact = project.get_artifact("train_data")
+di = project.get_dataitem("train_data")
+di.key
 ```
 
 Furthermore, the amount of data may be significant so the default container space may be not enough. The operation expects a volume
