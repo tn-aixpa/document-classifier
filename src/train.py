@@ -210,7 +210,7 @@ from datetime import date, datetime
 import os
 
 import json
-import evaluate
+# import wandb
 
 class BertForSentenceClassification(PreTrainedModel):
 
@@ -241,7 +241,15 @@ class BertForSentenceClassification(PreTrainedModel):
 
             f1_score = self.f1(logits.argmax(dim=1), labels)
             accuracy_score = self.accuracy(logits.argmax(dim=1), labels)
-        
+            # wandb.log({
+            #     "f1_score": f1_score,
+            #     "accuracy": accuracy_score,
+            #     'CrossEntropyLoss': loss.item() if loss is not None else None
+            # })
+            # print("F1 score", f1_score)
+            # print("accuracy", accuracy_score)
+            # print("CrossEntropyLoss", loss.item())
+
         return SequenceClassifierOutput(loss=loss, logits=logits)
 
 class TrainerHandler:
@@ -360,6 +368,11 @@ class TrainerHandler:
         self.save_model_and_tokenizer()
         print("Done.")
 
+
+    
+file_basepath = "document-classifier"
+
+import evaluate
 def compute_metrics(eval_pred):
     metrics = ["f1","accuracy", "recall", "precision"] #List of metrics to return ,
     metric={}
@@ -397,13 +410,20 @@ def compute_metrics(eval_pred):
     
     return metric_res
     
-file_basepath = "document_classifier"
-
-def train(project, train_data, data_path = "data", model_save_path = "model", target_model_name = ""):
+def train(project,
+          di,
+          target_model_name="",
+          num_train_epochs=3,
+          per_device_train_batch_size=16,
+          per_device_eval_batch_size=16,
+          gradient_accumulation_steps=2,
+          weight_decay=0.005,
+          learning_rate=1e-5,
+          lr_scheduler_type='linear'):
 
     global model_dir
-    model_dir = f"{file_basepath}/{model_save_path}"
-    data_dir = f"{file_basepath}/{data_path}"
+    model_dir = f"{file_basepath}/model"
+    data_dir = f"{file_basepath}/data"
     
     try:
         shutil.rmtree(data_dir)
@@ -415,27 +435,28 @@ def train(project, train_data, data_path = "data", model_save_path = "model", ta
         makedirs(data_dir)
 
     try:
-        train_data.download(data_dir) # this must change in the function
-    except:
-        print("Error downloading data")
-        
-    try:
         shutil.rmtree(model_dir)
     except:
         print("Error deleting model dir")
         
      # Create the directory for the model
     if not path.exists(model_dir):
-        makedirs(model_dir)    
+        makedirs(model_dir)   
 
+    data = di.as_df()
+    data = data.loc[:, ~data.columns.str.contains('^Unnamed')]
+    file_input = data.to_csv(f'{data_dir}/data.csv', encoding='UTF-8', index=False)          
+    print(file_input)
+              
     model_name = "dbmdz/bert-base-italian-xxl-cased"
-    dataloader = Dataloader(file_path= f'{data_dir}/addestramento.gzip')
+    
+    dataloader = Dataloader(file_path=f'{data_dir}/data.csv')
     dataloader.load_data()
     dataloader.stratified_split()
     dataset = dataloader.get_dataset()
-    # class_weights = dataloader.get_class_weights()
     num_labels = dataloader.get_num_labels()
     encoding = dataloader.get_encoding()
+    
     tokenize_function = TokenizerFunction(model_name=model_name, max_length=512)
     tokenized_datasets = (dataset.map(tokenize_function, batched=True)
                           .shuffle(seed=25)
@@ -452,13 +473,13 @@ def train(project, train_data, data_path = "data", model_save_path = "model", ta
         eval_strategy='epoch',
         save_strategy='epoch',
         save_total_limit=2,
-        num_train_epochs=3,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
-        gradient_accumulation_steps=2,
-        weight_decay=0.005,
-        learning_rate=1e-5,
-        lr_scheduler_type='linear',
+        num_train_epochs=num_train_epochs,
+        per_device_train_batch_size=per_device_train_batch_size,
+        per_device_eval_batch_size=per_device_eval_batch_size,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        weight_decay=weight_decay,
+        learning_rate=learning_rate,
+        lr_scheduler_type=lr_scheduler_type,
         load_best_model_at_end=True,
         evaluation_strategy = "epoch", #To calculate metrics per epoch
         logging_strategy="epoch"
@@ -504,5 +525,4 @@ def train(project, train_data, data_path = "data", model_save_path = "model", ta
         base_model="dbmdz/bert-base-italian-xxl-cased",
         metrics=metrics,
         source=model_dir,
-    )             
-
+    ) 
