@@ -14,7 +14,7 @@ func = project.new_function(
     name="serve", 
     kind="python", 
     python_version="PYTHON3_10", 
-    code_src="git+https://<username>:<personal_access_token>@github.com/tn-aixpa/document-classifier",     
+    code_src="git+https://github.com/tn-aixpa/document-classifier",     
     handler="src.serve:serve",
     init_function="init",
     requirements=["numpy<2", "pandas==2.1.4","transformer_engine==1.12.0", "transformer_engine_cu12==1.12.0", "transformers==4.46.3", "torch==2.5.1", "torchmetrics==1.6.0"]
