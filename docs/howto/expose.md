@@ -1,6 +1,6 @@
 # How to expose classifier model
 
-The classifer model may be exposed as an API for classification in different modes. In this template project, we have used the Custom API approach to serve the generated model.
+The classifer model may be exposed as an API for classification in different approaches. In this template project, we have used the Custom API approach to serve the generated model.
 
 ## Exposing model with Custom API
 
