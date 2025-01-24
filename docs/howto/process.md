@@ -22,15 +22,13 @@ project = dh.get_or_create_project(PROJECT_NAME)
 
 ```python
 URL='https://raw.githubusercontent.com/tn-aixpa/document-classifier/refs/heads/main/src/train_data.csv'
-artifact = project.log_dataitem(name="train_data",
-                    kind="table",
-                    source=URL)
+di = project.new_dataitem(name="train_data",kind="table",path=URL)
 ```
 Note that to invoke the operation on the platform, the data should be avaialble as an artifact on the platform datalake.
 
 ```python
-artifact = project.get_artifact("train_data")
-artifact.key
+di = project.get_dataitem("train_data")
+di.key
 ```
 
-The resulting dataset will be registered as the project artifact in the datalake under the name ``train_data``.
+The resulting dataset will be registered as the project dataitem in the datalake under the name ``train_data``.
