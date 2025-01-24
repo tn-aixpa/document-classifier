@@ -20,7 +20,7 @@ func = project.new_function(
     name="train", 
     kind="python", 
     python_version="PYTHON3_10", 
-    code_src="git+https://<username>:<personal_access_token>@github.com/tn-aixpa/document-classifier", 
+    code_src="git+https://github.com/tn-aixpa/document-classifier", 
     handler="src.train:train",
     requirements=["accelerate==1.1.1", "evaluate", "datasets==3.1.0", "torch==2.5.1", "torch_tensorrt==2.5.0", "torchmetrics==1.6.0", "torchtext==0.18.0", "transformer_engine==1.12.0", "transformer_engine_cu12==1.12.0", "transformers==4.46.3", "pandas==2.2.3", "numpy==2.1.3", "numpyencoder==0.3.0", "scikit-learn==1.5.2", "scipy==1.14.1", "GitPython==3.1.43", "attrs==24.2.0", "async-timeout==5.0.1", "aiosignal==1.3.1", "aiohappyeyeballs==2.4.4", "aiohttp==3.11.9", "Unidecode==1.3.8"]
 )
@@ -32,7 +32,7 @@ The function represent a Python operation and may be invoked directly locally or
 Note that to invoke the operation on the platform, the data should be avaialble as an artifact on the platform datalake.
 
 ```python
-artifact = project.get_artifact("train_data_it")
+artifact = project.get_artifact("train_data")
 ```
 
 Furthermore, the amount of data may be significant so the default container space may be not enough. The operation expects a volume
@@ -40,14 +40,20 @@ attached to the container under ``/files`` path. Create a persistent volume clai
 
 
 ```python
-train_run = func.run(action="job", inputs={"train_data": artifact.key},
-					parameters={"data_path": "/data", "model_save_path": "/models", "target_model_name": "document-classifier"},
-					volumes=[{ 
-					"volume_type": "persistent_volume_claim", 
-					"name": "volume-document-classifier", 
-					"mount_path": "/files", 
-					"spec": { "claim_name": "volume-document-classifier" }}]
-					)
+train_run = func.run(action="job",
+                     inputs={"di": di.key},
+                     profile="1xa100",
+                     parameters={
+                         "target_model_name": "document-classifier",
+                         "num_train_epochs": 2,
+                         "per_device_train_batch_size": 16,
+                         "per_device_eval_batch_size": 16,
+                         "gradient_accumulation_steps": 2,
+                         "weight_decay": 0.005,
+                         "learning_rate": 1e-5,
+                         "lr_scheduler_type": 'linear'
+                     },
+                     local_execution=False)
 ```
 
 Here the training targets Italian and the corresponding base model is selected. The resulting model will be registered as the project model under the name ``document-classifier``.
