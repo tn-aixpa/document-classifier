@@ -13,7 +13,7 @@ func = project.new_function(
     name="serve", 
     kind="python", 
     python_version="PYTHON3_10", 
-    code_src="git+https://<username>:<personal_access_token>@github.com/tn-aixpa/faudit-classifier",     
+    code_src="git+https://github.com/tn-aixpa/document-classifier",     
     handler="src.serve:serve",
     init_function="init",
     requirements=["numpy<2", "pandas==2.1.4","transformer_engine==1.12.0", "transformer_engine_cu12==1.12.0", "transformers==4.46.3", "torch==2.5.1", "torchmetrics==1.6.0"]
@@ -23,7 +23,7 @@ The function represent a Python Serverless function that should be deployed on c
 
 2. Activate the deployment.
 
-The amount of data may be significant so the default container space may be not enough. The operation expects a volume attached to the container under ``/files`` path. Create a Persistent Volume Clain first and attach it to the run as shown below
+The amount of data may be significant so the default container space may not be enough. The operation expects a volume attached to the container under ``/files`` path. Create a Persistent Volume Clain first and attach it to the run as shown below
 
 ```python
 serve_run = func.run(
