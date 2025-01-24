@@ -24,7 +24,7 @@ The training data is ready for use by the ``train`` operation (see [how to train
 - ``weight_decay`` (0.005): Decoupled weight decay to apply.
 - ``lr_scheduler_type`` ('linear'): By default, it uses “linear”. Internally, this retrieves get_linear_schedule_with_warmup scheduler from Trainer. Scheduler types (linear,cosine,cosine_with_restarts,polynomial,constant). For more info see [HuggingFace transformer library](https://huggingface.co/docs/transformers/en/index)
 
-For the realistic datasets the GPU is required for training of the model. 
+The template project also demonstrate the usage of compute_metrics function which takes the predictions and labels over the whole evaluation dataset and computes the metrics from them. The metrics are written in the model output directory inside metrics.json file.
 
 ### Model serving
 Once model is ready, it is possible to expose a service (API) on top of the model. The model here is exposed using ``serve`` operation that provides an implementation of python-based Serverless function for exposing a custom API. The API allows for specifying the max number of labels to return. 
