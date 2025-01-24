@@ -1,6 +1,6 @@
 # How to expose classifier model
 
-The classifer model may be exposed as an API for classification in different approaches. In this template project, we have used the Custom API approach to serve the generated model.
+The classifer model may be exposed as an API for classification. In this template project, we have used the Custom API approach to serve the generated model.
 
 ## Exposing model with Custom API
 
@@ -45,7 +45,7 @@ To test the functionality of the API, it is possible to use the V2 API calls. Th
 classification labels required. For e.g. the request below asks for single classification label for input text.
 
 ```python
-inputs = {"text": 'famiglia wifi ', "k": 1}
+inputs = {"text": 'trasporto wifi ', "k": 1}
 serve_run.invoke(json={"inference_input": inputs}).text
 ```
 
