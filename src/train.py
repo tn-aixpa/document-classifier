@@ -241,15 +241,7 @@ class BertForSentenceClassification(PreTrainedModel):
 
             f1_score = self.f1(logits.argmax(dim=1), labels)
             accuracy_score = self.accuracy(logits.argmax(dim=1), labels)
-            # wandb.log({
-            #     "f1_score": f1_score,
-            #     "accuracy": accuracy_score,
-            #     'CrossEntropyLoss': loss.item() if loss is not None else None
-            # })
-            # print("F1 score", f1_score)
-            # print("accuracy", accuracy_score)
-            # print("CrossEntropyLoss", loss.item())
-
+     
         return SequenceClassifierOutput(loss=loss, logits=logits)
 
 class TrainerHandler:
@@ -370,7 +362,7 @@ class TrainerHandler:
 
 
     
-file_basepath = "document-classifier"
+file_basepath = "/local-data"
 
 import evaluate
 def compute_metrics(eval_pred):

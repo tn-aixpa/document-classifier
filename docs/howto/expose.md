@@ -23,17 +23,9 @@ The function represent a Python Serverless function that should be deployed on c
 
 2. Activate the deployment.
 
-The amount of data may be significant so the default container space may not be enough. The operation expects a volume attached to the container under ``/files`` path. Create a Persistent Volume Clain first and attach it to the run as shown below
-
 ```python
 serve_run = func.run(
-    action="serve",
-    volumes=[{ 
-            "volume_type": "persistent_volume_claim", 
-            "name": "volume-document-classifier", 
-            "mount_path": "/files", 
-            "spec": { "claim_name": "volume-document-classifier" }
-        }]
+    action="serve"
 )
 ```
 
