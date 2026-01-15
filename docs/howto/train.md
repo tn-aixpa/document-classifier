@@ -54,7 +54,15 @@ train_run = func.run(action="job",
                          "learning_rate": 1e-5,
                          "lr_scheduler_type": 'linear'
                      },
+                     volumes=[{
+                         "volume_type": "persistent_volume_claim",
+                         "name": "train-volume",
+                         "mount_path": "/local-data",
+                         "spec": {
+                             "size": "20Gi"
+                     }}],
                      local_execution=False)
+
 ```
 
 Here the training targets Italian and the corresponding base model is selected. The resulting model will be registered as the project model under the name ``document-classifier``.
