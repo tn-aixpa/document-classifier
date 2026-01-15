@@ -54,13 +54,18 @@ train_run = func.run(action="job",
                          "learning_rate": 1e-5,
                          "lr_scheduler_type": 'linear'
                      },
+                     resources={"mem": "32Gi", "cpu": "6"},
                      volumes=[{
                          "volume_type": "persistent_volume_claim",
                          "name": "train-volume",
                          "mount_path": "/local-data",
                          "spec": {
-                             "size": "20Gi"
-                     }}],
+                             "size": "100Gi"
+                         }}],
+                      envs=[
+                        {"name": "HF_HOME", "value": "/local-data/huggingface"},
+                        {"name": "TRANSFORMERS_CACHE", "value": "/local-data/huggingface"}
+                     ],  
                      local_execution=False)
 
 ```
