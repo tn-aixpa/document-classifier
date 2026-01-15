@@ -15,7 +15,7 @@ The data used for training can be found inside 'src' directory 'addestramento.gz
 
 ### Model training
 
-The training data is ready for use by the ``train`` operation (see [how to train the classifier model](./docs/howto/train.md) for details). The operation relies on a series of hyper parameters typical for this kind of models:
+The training data is ready for use by the ``train`` operation (see [how to train the classifier model](./howto/train.md) for details). The operation relies on a series of hyper parameters typical for this kind of models:
 
 - ``epochs`` (100): number of training epochs
 - ``batch_size`` (8): batch size of the dataset
