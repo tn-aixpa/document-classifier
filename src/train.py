@@ -416,6 +416,8 @@ def train(project,
     global model_dir
     model_dir = f"{file_basepath}/model"
     data_dir = f"{file_basepath}/data"
+    logging_dir = f"{file_basepath}/logging"
+    output_dir = f"{file_basepath}/tuned_model"
     
     try:
         shutil.rmtree(data_dir)
@@ -433,8 +435,23 @@ def train(project,
         
      # Create the directory for the model
     if not path.exists(model_dir):
-        makedirs(model_dir)   
+        makedirs(model_dir)
+        
+    if not path.exists(logging_dir):
+        makedirs(logging_dir)    
+    if not path.exists(output_dir):
+        makedirs(output_dir)
 
+    model_params = {
+        "num_train_epochs": num_train_epochs,
+        "per_device_train_batch_size": per_device_train_batch_size,
+        "per_device_eval_batch_size": per_device_eval_batch_size,
+        "gradient_accumulation_steps": gradient_accumulation_steps,
+        "weight_decay": weight_decay,
+        "learning_rate": learning_rate,
+        "lr_scheduler_type": lr_scheduler_type
+    }
+ 
     data = di.as_df()
     data = data.loc[:, ~data.columns.str.contains('^Unnamed')]
     file_input = data.to_csv(f'{data_dir}/data.csv', encoding='UTF-8', index=False)          
@@ -461,7 +478,8 @@ def train(project,
                           config=config,
                           num_labels=num_labels)) #class_weights=class_weights
     training_args = TrainingArguments(
-        output_dir='tuned_model',
+        output_dir=output_dir,
+        logging_dir=logging_dir,
         eval_strategy='epoch',
         save_strategy='epoch',
         save_total_limit=2,
@@ -496,14 +514,7 @@ def train(project,
         model_save_path=model_dir
     )
     handler.run()
-
-    # metrics={}
-    # df = pd.read_csv(model_dir + '/' +  f'{target_model_name}.csv')
-    # last_row = df.tail(1)
-    # metrics['F1'] = last_row['F1'].values[0]
-    # for key, value in df.iterrows():
-    #     metrics[f'F1_epoch{key+1}'] = value['F1']
-    
+     
     df = pd.read_json(model_dir + '/metrics.json')
     last_row = df.tail(1)
     model_metrics = ["f1","accuracy", "recall", "precision"]
@@ -511,10 +522,12 @@ def train(project,
     for met in model_metrics:    
         metrics[met] = last_row[met].values[0]
     
+    # Log the model to the project
     project.log_model(
         name=target_model_name,
         kind="huggingface",
         base_model="dbmdz/bert-base-italian-xxl-cased",
+        parameters=model_params,
         metrics=metrics,
         source=model_dir,
     ) 
