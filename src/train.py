@@ -379,28 +379,28 @@ def compute_metrics(eval_pred):
         else:
             metric_res[met]=metric[met].compute(predictions=predictions, references=labels)[met]
     
-    dir = f"{model_dir}"
-    DATA_FILENAME = dir +  '/metrics.json';
+    if not path.exists(model_dir):
+        makedirs(model_dir)
+        
+    data_filename = 'train_metrics.csv'
+    row = pd.DataFrame({k: [v] for k, v in metric_res.items()})
+    #print('\nSaving training metrics\n')  #DEBUGGING
 
-    print("GOING TO SAVE METRICS INSIDE ->", DATA_FILENAME)
+    dataframe_append(directory=model_dir, data_filename=data_filename, row=row)
 
-    # Create the directory for the data
-    if not path.exists(dir):
-        makedirs(dir)
-    
-    file_data = []
-    if (path.exists(DATA_FILENAME)):
-        with open(DATA_FILENAME , "r") as json_file:
-            file_data = json.loads(json_file.read())
-
-    # change it
-    file_data.append(metric_res)     
-
-    # write it all back 
-    with open(DATA_FILENAME , "w") as json_file:
-        json_file.write(json.dumps(file_data))
-    
     return metric_res
+
+def dataframe_append(directory, data_filename, row):
+    # module for use in different stages of training and testing
+    if not path.exists(model_dir):
+        makedirs(model_dir)
+    FN = directory + '/' + data_filename
+
+    if not (path.exists(FN)):
+        row.to_csv(FN, index=False, header=True)
+    else:
+        row.to_csv(FN, mode='a', index=False, header=False)
+
     
 def train(project,
           di,
@@ -514,20 +514,19 @@ def train(project,
         model_save_path=model_dir
     )
     handler.run()
-     
-    df = pd.read_json(model_dir + '/metrics.json')
+    
+    df = pd.read_csv(model_dir + '/train_metrics.csv')
     last_row = df.tail(1)
     model_metrics = ["f1","accuracy", "recall", "precision"]
     metrics = {}
     for met in model_metrics:    
         metrics[met] = last_row[met].values[0]
-    
-    # Log the model to the project
-    project.log_model(
+    mdl = project.log_model(
         name=target_model_name,
         kind="huggingface",
         base_model="dbmdz/bert-base-italian-xxl-cased",
         parameters=model_params,
-        metrics=metrics,
         source=model_dir,
-    ) 
+    )            
+    for k in metrics:
+        mdl.log_metric(k, metrics[k])

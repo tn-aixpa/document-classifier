@@ -54,13 +54,13 @@ train_run = func.run(action="job",
                          "learning_rate": 1e-5,
                          "lr_scheduler_type": 'linear'
                      },
-                     resources={"mem": "32Gi", "cpu": "6"},
+                     resources={"mem": "6Gi"},
                      volumes=[{
                          "volume_type": "persistent_volume_claim",
                          "name": "train-volume",
                          "mount_path": "/local-data",
                          "spec": {
-                             "size": "100Gi"
+                             "size": "10Gi"
                          }}],
                       envs=[
                         {"name": "HF_HOME", "value": "/local-data/huggingface"},
